@@ -52,12 +52,35 @@ class Actions:
             command_word = list_of_words[0]
             print(MSG1.format(command_word=command_word))
             return False
+        raw_direction = list_of_words[1].strip().upper()
 
+        # Synonymes -> direction canonique
+        SYNONYMS = {
+            "N": "N", "NORD": "N", "NORTH": "N", "Nord" : "N", "nord" : "N",
+            "S": "S", "SUD": "S", "SOUTH": "S", "Sud" : "S", "sud" : "S",
+            "E": "E", "EST": "E", "EAST": "E", "Est" : "E", "est" : "E",
+            "O": "O", "OUEST": "O", "WEST": "O", "Ouest" : "O", "ouest" : "O",
+            "U": "U", "UP": "U", "HAUT": "U", "Haut": "U", "haut": "U",
+            "D": "D", "DOWN": "D", "BAS": "D", "Bas": "D", "bas": "D",
+        }
+
+        # Si la direction correspond directement
+        if raw_direction in SYNONYMS:
+            direction = SYNONYMS[raw_direction]
+        else:
+            # Test sur la première lettre (ex : "ouest")
+            if raw_direction and raw_direction[0] in SYNONYMS:
+                direction = SYNONYMS[raw_direction[0]]
+            else:
+                print(f"\nDirection inconnue : '{list_of_words[1]}'.")
+                return False
         # Get the direction from the list of words.
-        direction = list_of_words[1]
-        # Move the player in the direction specified by the parameter.
-        player.move(direction)
-        return True
+        if direction not in game.valid_directions:
+            print(f"\nImpossible d'aller vers '{direction}' : direction non utilisée sur la carte.\n")
+            return False
+
+        # Tout est bon → déplacement
+        return game.player.move(direction)
 
     def quit(game, list_of_words, number_of_parameters):
         """
