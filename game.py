@@ -47,72 +47,77 @@ class Game:
         self.commands["up"] = cmd_up_obj
         self.commands["down"] = cmd_down_obj
 
-        # ---------- Création des lieux (thème : Temple de l'eau) ----------
-        # Rez-de-chaussée : grille 3x3 (NW, N, NE, W, CENTRE, E, SW, S, SE)
-        nw = Room("Aile nord-ouest", "un couloir envahi d'algues, les mosaïques sont effacées.")
-        n = Room("Salle supérieure RC", "une chambre humide surplombant la cour.")
-        ne = Room("Aile nord-est", "l'aile nord-ouest, vous voyez des mosaïques effacées et des statues à moitié submergées.")
-        w = Room("Aile ouest", " un passage bordé de bassins verts et de vannes rouillées.")
-        centre = Room("Salle centrale", "la chambre centrale du temple, il y a un grand pilier inondé.")
-        e = Room("Aile est", "une galerie au carrelage glissant, l'eau coule en filet.")
-        sw = Room("Aile sud-ouest", "l'aile sud-ouest, il y a des marches couvertes de mousse et de végétation.")
-        s = Room("Salle sud", "une galerie où l'eau ruisselle doucement sur les pierres.")
-        se = Room("Aile sud-est", "une salle où il y a des statues marines partiellement immergées.")
 
-        # Ajouter au registre des rooms
-        self.rooms.extend([nw, n, ne, w, centre, e, sw, s, se])
+        hebra = Room("la Région d'Hébra", "Une région glaciale avec des montagnes gelées et des plateaux de toundra où souffle un vent mordant. On y trouve le village piaf.")
+        korok = Room("la Forêt Korogu", "une forêt ancienne et mystérieuse, cœur du Grand Bois d'Hyrule, où de petites créatures mignonnes appelées Korogus veillent.")
+        ordinn = Room("la Région d'Ordinn", "on y trouve la Montagne de la Mort, un puissant volcan explosif qui menace le village Goron. Les Gorons se nourissent de roches provenant du volcan")
 
-        # Connexions horizontales/verticales (N,E,S,O) - grille 3x3
-        # Ligne nord
-        nw.exits = {"N": None, "E": n, "S": w, "O": None}
-        n.exits = {"N": None, "E": ne, "S": centre, "O": nw}
-        ne.exits = {"N": None, "E": None, "S": e, "O": n}
 
-        # Ligne milieu
-        w.exits = {"N": nw, "E": centre, "S": sw, "O": None}
-        centre.exits = {"N": n, "E": e, "S": s, "O": w}
-        e.exits = {"N": ne, "E": None, "S": se, "O": centre}
+        gerudo_high = Room("les Hauteurs Gerudo", "des falaises gelées surplombant le désert, offrant des vues spectaculaires.")
+        centre_hyrule = Room("le Centre d'Hyrule", "de vastes plaines parsemé de ruines et sanctuaires, avec le château d'Hyrule au loin.")
+        laneyru = Room("Région de Lanelle", "il ya le Domaine Zora et le village cocorico")
 
-        # Ligne sud
-        sw.exits = {"N": w, "E": s, "S": None, "O": None}
-        s.exits = {"N": centre, "E": se, "S": None, "O": sw}
-        se.exits = {"N": e, "E": None, "S": None, "O": s}
+        gerudo_desert = Room("le Désert Gerudos", "vous voyez des dunes de sables à perte de vue, les oasis sont rares et les tempêtes de sable fréquente.")
+        firone = Room("la Région de Firone", "composée de forêts humides et luxuriantes, le tonnerre frappe souvent et la végétation est très dense.")
+        necluda = Room("la Région de Necluda", "on y trouve principalement le village d'Elimith, connu pour ses terres agricoles et sa gastronomie variées.")
 
-        # ---------- 1er étage : 2 salles ----------
-        first_a = Room("Galerie supérieure A", "une passerelle surplombant la chambre centrale.")
-        first_b = Room("Galerie supérieure B", "une loge humide avec vue sur le pilier.")
 
-        self.rooms.extend([first_a, first_b])
+        self.rooms.extend([
+         hebra, korok, ordinn,
+         gerudo_high, centre_hyrule, laneyru,
+         gerudo_desert, firone, necluda
+         ])
 
-        # Accès vertical vers le 1er étage depuis la salle centrale et depuis la salle N (r0c1)
-        centre.exits["U"] = first_a
-        n.exits["U"] = first_b
 
-        # Connecter les salles du 1er étage entre elles et redescente
-        first_a.exits = {"D": centre, "E": first_b, "O": None, "N": None, "S": None}
-        first_b.exits = {"D": n, "O": first_a, "N": None, "E": None, "S": None}
+        hebra.exits = {"N": None, "E": korok, "S": gerudo_high, "O": None}
+        korok.exits = {"N": None, "E": ordinn, "S": centre_hyrule, "O": hebra}
+        ordinn.exits = {"N": None, "E": None, "S": laneyru, "O": korok}
 
-        # ---------- Sous-sol : 2 salles ----------
-        basement_a = Room("Galerie inférieure A", "une alcôve immergée, l'air est plus frais.")
-        basement_b = Room("Galerie inférieure B", "des canaux sombres où l'eau coule lentement.")
 
-        self.rooms.extend([basement_a, basement_b])
+        gerudo_high.exits = {"N": hebra, "E": centre_hyrule, "S": gerudo_desert, "O": None}
+        centre_hyrule.exits = {"N": korok, "E": laneyru, "S": firone, "O": gerudo_high}
+        laneyru.exits = {"N": ordinn, "E": None, "S": necluda, "O": centre_hyrule}
 
-        # Accès vertical vers le sous-sol depuis la salle centrale et depuis la salle N
-        centre.exits["D"] = basement_a
-        n.exits["D"] = basement_b
 
-        # Connecter les salles du sous-sol entre elles et remontée
-        basement_a.exits = {"U": centre, "E": basement_b, "O": None, "N": None, "S": None}
-        basement_b.exits = {"U": n, "O": basement_a, "N": None, "E": None, "S": None}
+        gerudo_desert.exits = {"N": gerudo_high, "E": firone, "S": None, "O": None}
+        firone.exits = {"N": centre_hyrule, "E": necluda, "S": None, "O": gerudo_desert}
+        necluda.exits = {"N": laneyru, "E": None, "S": None, "O": firone}
+
+
+        iles_ciel_a = Room("L'Île céleste du prélude", "une île flottante parsemée de ruines et enigmes à résoudre.")
+        iles_ciel_b = Room("L'Île céleste de Lanelle", "archipel céléste de plateformes anciennes, dominé par des vents puissants.")
+
+        self.rooms.extend([iles_ciel_a, iles_ciel_b])
+
+
+        centre_hyrule.exits["U"] = iles_ciel_a
+        korok.exits["U"] = iles_ciel_b
+
+
+        iles_ciel_a.exits = {"D": centre_hyrule, "E": iles_ciel_b, "O": None, "N": None, "S": None}
+        iles_ciel_b.exits = {"D": korok, "O": iles_ciel_a, "N": None, "E": None, "S": None}
+
+
+        profondeurs_a = Room("Les profondeurs A", "dans le sous sol du chateau d'Hyrule, vous entendez des bruits étranges venant des ténèbres.")
+        profondeurs_b = Room("Les profondeurs B", "dans la grande mine abandonée, il y a des golems antiques et fragements de sonium partout.")
+
+        self.rooms.extend([profondeurs_a, profondeurs_b])
+
+        
+        centre_hyrule.exits["D"] = profondeurs_a
+        korok.exits["D"] = profondeurs_b
+
+   
+        profondeurs_a.exits = {"U": centre_hyrule, "E": profondeurs_b, "O": None, "N": None, "S": None}
+        profondeurs_b.exits = {"U": korok, "O": profondeurs_a, "N": None, "E": None, "S": None}
 
         # Setup player and starting room
         name = input("\nEntrez votre nom: ").strip()
         if not name:
             name = "Joueur"
         self.player = Player(name)
-        # Position de départ : Salle centrale
-        self.player.current_room = centre
+       
+        self.player.current_room = iles_ciel_a
         
         self.valid_directions = set()
         for room in self.rooms:
@@ -157,7 +162,7 @@ class Game:
 
     # Print the welcome message
     def print_welcome(self):
-        print(f"\nBienvenue {self.player.name} dans le temple de l'eau !")
+        print(f"\nBienvenue {self.player.name} dans le Royaume d'Hyrule !")
         print("Entrez 'help' si vous avez besoin d'aide.")
         print(self.player.current_room.get_long_description())
 

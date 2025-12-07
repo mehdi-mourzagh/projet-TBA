@@ -1,71 +1,49 @@
 # Define the Room class.
 
+# room.py
+from __future__ import annotations
+from typing import Dict, Optional
+
+
 class Room:
     """
-    Représente une salle du jeu.
+    Représente une salle / un lieu du jeu.
 
-    Une instance de Room contient un nom, une description
-    et un dictionnaire d'exits mappant des directions ('N', 'E', 'S', 'O')
-    vers d'autres Room ou None.
-
-    Attributs:
-
+    Attributs
+    ---------
     name : str
-        Nom de la salle
+        Nom de la salle (ex. "Région d'Hébra").
     description : str
-        Description textuelle du lieu
-        Exemple : "une forêt enchantée. Vous entendez une brise légère..."
+        Description du lieu (sans le mot "dans").
     exits : Dict[str, Optional[Room]]
-        Dictionnaire des sorties par direction ('N','E','S','O').
-        La valeur est soit une instance de Room soit None si aucune sortie.
-
-    Méthodes:
-
-    get_exit(direction: str) -> Optional[Room]
-        Retourne la Room située dans la direction demandée (ou None).
-    get_exit_string() -> str
-        Retourne une chaîne listant les directions de sortie valides.
-    get_long_description() -> str
-        Construit et retourne la description complète affichée au joueur,
-        en insérant le préfixe "Vous êtes dans " devant la description.
-
-    Exemples :
-
-    >>> r1 = Room("A", "une petite pièce lumineuse.")
-    >>> r2 = Room("B", "une cave sombre.")
-    >>> r1.exits['N'] = r2
-    >>> r1.get_exit('N') is r2
-    True
-    >>> 'N' in r1.exits and r1.exits['N'] is not None
-    True
-    >>> print(r1.get_long_description())  # doctest: +ELLIPSIS
-    Vous êtes dans une petite pièce lumineuse.
-    ...
+        Dictionnaire des sorties par direction ('N','E','S','O','U','D').
     """
-    # Define the constructor. 
-    def __init__(self, name, description):
+
+    def __init__(self, name: str, description: str) -> None:
         self.name = name
         self.description = description
-        self.exits = {}
-    
-    # Define the get_exit method.
-    def get_exit(self, direction):
+        self.exits: Dict[str, Optional["Room"]] = {}
 
-        # Return the room in the given direction if it exists.
-        if direction in self.exits.keys():
-            return self.exits[direction]
-        else:
+    def get_exit(self, direction: str) -> Optional["Room"]:
+        if not direction:
             return None
-    
-    # Return a string describing the room's exits.
-    def get_exit_string(self):
-        exit_string = "Sorties: " 
-        for exit in self.exits.keys():
-            if self.exits.get(exit) is not None:
-                exit_string += exit + ", "
-        exit_string = exit_string.strip(", ")
-        return exit_string
+        return self.exits.get(direction.upper())
 
-    # Return a long description of this room including exits.
-    def get_long_description(self):
-        return f"\nVous êtes dans {self.description}\n\n{self.get_exit_string()}\n"
+    def get_exit_string(self) -> str:
+        """Retourne une ligne listant les sorties valides (ex : 'Sorties: N, E')."""
+        valid_exits = [d for d, r in self.exits.items() if r is not None]
+        if not valid_exits:
+            return "Sorties : aucune"
+        return "Sorties : " + ", ".join(valid_exits)
+
+    def get_long_description(self) -> str:
+        """
+        Construit et retourne la description complète affichée au joueur.
+
+        Exemple de sortie :
+        "\nVous êtes dans la Région d'Hébra, des montagnes gelées...\n\nSorties : N, E\n"
+        """
+        desc = self.description.strip()
+       
+        header = f"\nVous êtes dans {self.name}, {desc}\n\n"
+        return header + self.get_exit_string() + "\n"
