@@ -16,6 +16,7 @@ class Game:
         self.commands = {}
         self.player = None
         self.valid_directions = set()
+        self.history = []
 
     # Setup the game
     def setup(self):
@@ -33,6 +34,16 @@ class Game:
             1,
         )
         self.commands["go"] = cmd_go
+        
+        history = Command("history", " : afficher l'historique des lieux visités", Actions.history, 0)
+        self.commands["history"] = history
+
+        back_cmd = Command("back", " : revenir au lieu précédent", Actions.back, 0)
+        self.commands["back"] = back_cmd
+
+        self.commands["retour"] = back_cmd
+
+
 
         # callbacks locaux pour up/down (appellent directement Player.move avec U/D)
         def cmd_up(game, list_of_words, number_of_parameters):
@@ -165,6 +176,16 @@ class Game:
         print(f"\nBienvenue {self.player.name} dans le Royaume d'Hyrule !")
         print("Entrez 'help' si vous avez besoin d'aide.")
         print(self.player.current_room.get_long_description())
+    def get_history(self) -> str:
+     if not hasattr(self, "history") or not self.history:
+        return ""   # chaîne vide si rien
+
+     lines = ["Vous avez déjà visité les pièces suivantes:"]
+     for room in self.history:
+        # j'affiche la description complète (ou room.name si tu préfères)
+        # ici on garde la description stockée (sans "dans"), ce qui colle avec get_long_description
+        lines.append(f"    - {room.name}")
+     return "\n".join(lines)
 
 
 def main():

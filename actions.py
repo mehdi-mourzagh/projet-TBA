@@ -78,7 +78,23 @@ class Actions:
         if direction not in game.valid_directions:
             print(f"\nImpossible d'aller vers '{direction}' : direction non utilisée sur la carte.\n")
             return False
+        prev_room = game.player.current_room
 
+        # Essayer de déplacer le joueur
+        moved = game.player.move(direction)  # doit retourner True si succès
+
+        # Si déplacement réussi, enregistrer l'ancienne salle dans l'historique
+        if moved:
+            # protège au cas où prev_room soit None (rare)
+            if prev_room not in game.history:
+               game.history.append(prev_room)
+            # optionnel: afficher l'historique après déplacement
+            hist_text = game.get_history()
+            if hist_text:
+                print("\n" + hist_text)
+            return True
+        else:
+            return False
         # Tout est bon → déplacement
         return game.player.move(direction)
 
@@ -159,4 +175,31 @@ class Actions:
         for command in game.commands.values():
             print("\t- " + str(command))
         print()
+        return True
+  
+    
+    def history(game, list_of_words, number_of_parameters):
+      text = game.get_history()
+      if not text:
+        print("\nAucun lieu visité pour le moment.\n")
+      else:
+        print("\n" + text + "\n")
+      return True
+        
+
+    def back(game, list_of_words, number_of_parameters):
+        # Vérifier qu'il y a quelque chose dans l'historique
+        if not hasattr(game, "history") or not game.history:
+            print("\nHistorique vide : impossible de revenir en arrière.\n")
+            return False
+        # Récupérer la dernière salle visitée
+        previous_room = game.history.pop()
+        game.player.current_room = previous_room
+        # Afficher la description de la salle où on revient
+        print(previous_room.get_long_description())
+
+        # Afficher l'historique mis à jour (si non vide)
+        hist_text = game.get_history()
+        if hist_text:
+            print("\n" + hist_text)
         return True
